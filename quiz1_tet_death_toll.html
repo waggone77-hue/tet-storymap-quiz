@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz #1: Tet Offensive Death Toll</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: #f5f5f5;
+    }
+
+    .quiz-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    .question {
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .question:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .question-text {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .answer {
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fafafa;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+    }
+
+    .answer:hover {
+      transform: translateY(-1px);
+      background: #f0f0f0;
+    }
+
+    .answer.correct {
+      background: #d1f5d3;
+      border-color: #2e7d32;
+      font-weight: 600;
+    }
+
+    .answer.incorrect {
+      background: #ffdddd;
+      border-color: #c62828;
+    }
+
+    .answer.disabled {
+      cursor: default;
+      opacity: 0.9;
+    }
+
+    .feedback {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+
+    .feedback.correct-text {
+      color: #2e7d32;
+    }
+
+    .feedback.incorrect-text {
+      color: #c62828;
+    }
+
+    .info {
+      font-size: 0.9rem;
+      color: #444;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      .quiz-container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Quiz #1: What was the total estimated death toll in the Tet Offensive?</h1>
+    <p class="subtitle">
+      Click an answer. If you’re wrong, the correct one will be highlighted and a short explanation will appear.
+    </p>
+
+    <!-- Single Question: Tet Offensive death toll -->
+    <div class="question" data-correct="c">
+      <div class="question-text">
+        Historians estimate the combined death toll of the Tet Offensive (including communist forces, U.S. and South Vietnamese troops, and civilians) was:
+      </div>
+      <div class="answers">
+        <button class="answer" data-option="a">
+          A. About 10,000 people
+        </button>
+        <button class="answer" data-option="b">
+          B. About 25,000 people
+        </button>
+        <button class="answer" data-option="c">
+          C. About 80,000 people
+        </button>
+        <button class="answer" data-option="d">
+          D. About 250,000 people
+        </button>
+      </div>
+      <div class="feedback"></div>
+      <div class="info">
+        Estimates vary, but historians combining communist, U.S., South Vietnamese, and civilian deaths
+        generally put the Tet Offensive's death toll at over 80,000 people. Rough figures include more than
+        58,000 communist troops killed by the end of the offensive, nearly 3,900 U.S. dead, about 5,000 South
+        Vietnamese soldiers killed, and roughly 14,000 civilians who died in the fighting.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll(".question").forEach((question) => {
+      const correctOption = question.dataset.correct;
+      const buttons = question.querySelectorAll(".answer");
+      const feedback = question.querySelector(".feedback");
+      const info = question.querySelector(".info");
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          // Prevent re-answering once a question is done
+          if (question.classList.contains("answered")) return;
+          question.classList.add("answered");
+
+          const chosen = btn.dataset.option;
+
+          // Disable all buttons after first click
+          buttons.forEach((b) => b.classList.add("disabled"));
+
+          // Clear any previous classes (just in case)
+          buttons.forEach((b) => {
+            b.classList.remove("correct", "incorrect");
+          });
+
+          if (chosen === correctOption) {
+            btn.classList.add("correct");
+            feedback.textContent = "Correct!";
+            feedback.classList.add("correct-text");
+          } else {
+            btn.classList.add("incorrect");
+            // Highlight the correct answer
+            const correctBtn = question.querySelector(
+              '.answer[data-option="' + correctOption + '"]'
+            );
+            if (correctBtn) {
+              correctBtn.classList.add("correct");
+            }
+            feedback.textContent = "Not quite — check the highlighted correct answer.";
+            feedback.classList.add("incorrect-text");
+          }
+
+          // Show explanation snippet
+          if (info) {
+            info.style.display = "block";
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
