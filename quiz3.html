@@ -16,15 +16,16 @@
     .quiz-container {
       max-width: 800px;
       margin: 0 auto;
-      background: #111111; /* dark panel */
-      padding: 1.5rem;
-      border-radius: 12px;
+      background: #181818; /* slightly lighter dark panel */
+      padding: 1.75rem;
+      border-radius: 16px;
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
-      border: 1px solid #333333;
+      border: 1px solid #555555;
+      min-height: 200px;
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       margin-bottom: 0.75rem;
       color: #ffffff;
     }
@@ -63,8 +64,8 @@
     .answer {
       padding: 0.45rem 0.75rem;
       border-radius: 8px;
-      border: 1px solid #444444;
-      background: #1c1c1c;
+      border: 1px solid #555555;
+      background: #222222;
       cursor: pointer;
       text-align: left;
       font-size: 0.95rem;
@@ -77,4 +78,143 @@
     }
 
     .answer:hover {
-      transform: translateY
+      transform: translateY(-1px);
+      background: #2c2c2c;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .answer.correct {
+      background: #154a26; /* dark green */
+      border-color: #2ecc71;
+      font-weight: 600;
+      box-shadow: 0 0 8px rgba(46, 204, 113, 0.6);
+    }
+
+    .answer.incorrect {
+      background: #4a1515; /* dark red */
+      border-color: #e74c3c;
+      box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+    }
+
+    .answer.disabled {
+      cursor: default;
+      opacity: 0.9;
+    }
+
+    .feedback {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+
+    .feedback.correct-text {
+      color: #2ecc71;
+    }
+
+    .feedback.incorrect-text {
+      color: #e74c3c;
+    }
+
+    .info {
+      font-size: 0.9rem;
+      color: #dddddd;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      .quiz-container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Quiz #2: Which U.S. Intelligence Agency Collected HUMINT?</h1>
+    <p class="subtitle">
+      Click an answer. If you’re wrong, the correct one will be highlighted and a short explanation will appear.
+    </p>
+
+    <!-- Single Question: HUMINT agency -->
+    <div class="question" data-correct="a">
+      <div class="question-text">
+        During the Vietnam War, which U.S. intelligence agency was primarily responsible for the collection of human intelligence (HUMINT)?
+      </div>
+      <div class="answers">
+        <button class="answer" data-option="a">
+          A. CIA (Central Intelligence Agency)
+        </button>
+        <button class="answer" data-option="b">
+          B. NSA (National Security Agency)
+        </button>
+        <button class="answer" data-option="c">
+          C. DIA (Defense Intelligence Agency)
+        </button>
+        <button class="answer" data-option="d">
+          D. CRV
+        </button>
+      </div>
+      <div class="feedback"></div>
+      <div class="info">
+        The CIA was the lead U.S. agency for HUMINT, running networks of agents, informants, and covert programs.
+        Fun fact: in Vietnam, the CIA worked closely with South Vietnamese services and helped run operations like the Phoenix Program,
+        which targeted the Viet Cong’s political infrastructure—hugely controversial then and now.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll(".question").forEach((question) => {
+      const correctOption = question.dataset.correct;
+      const buttons = question.querySelectorAll(".answer");
+      const feedback = question.querySelector(".feedback");
+      const info = question.querySelector(".info");
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          // Prevent re-answering once a question is done
+          if (question.classList.contains("answered")) return;
+          question.classList.add("answered");
+
+          const chosen = btn.dataset.option;
+
+          // Disable all buttons after first click
+          buttons.forEach((b) => b.classList.add("disabled"));
+
+          // Clear any previous classes
+          buttons.forEach((b) => {
+            b.classList.remove("correct", "incorrect");
+          });
+
+          if (chosen === correctOption) {
+            btn.classList.add("correct");
+            feedback.textContent = "Correct!";
+            feedback.classList.add("correct-text");
+          } else {
+            btn.classList.add("incorrect");
+            // Highlight the correct answer
+            const correctBtn = question.querySelector(
+              '.answer[data-option="' + correctOption + '"]'
+            );
+            if (correctBtn) {
+              correctBtn.classList.add("correct");
+            }
+            feedback.textContent = "Not quite — check the highlighted correct answer.";
+            feedback.classList.add("incorrect-text");
+          }
+
+          // Show explanation snippet
+          if (info) {
+            info.style.display = "block";
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
