@@ -8,8 +8,9 @@
     :root {
       --bg-main: #000000;
       --bg-card: #101010;
+      --bg-card-alt: #161616;
       --accent: #e74c3c;
-      --accent-soft: #c0392b;
+      --accent-muted: #c0392b;
       --text-main: #f5f5f5;
       --text-muted: #a0a0a0;
       --border-subtle: #333333;
@@ -39,7 +40,7 @@
     }
 
     .card {
-      background: linear-gradient(135deg, #101010, #161616);
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card-alt));
       border-radius: 18px;
       border: 1px solid var(--border-subtle);
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
@@ -56,14 +57,20 @@
     .header-subtitle {
       font-size: 0.92rem;
       color: var(--text-muted);
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       max-width: 800px;
+    }
+
+    /* Hide radio inputs, but keep them in the DOM */
+    .timeline-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
     }
 
     /* TIMELINE BAR */
     .timeline-wrapper {
-      margin-top: 4px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       position: relative;
       padding: 16px 10px 26px;
       border-radius: 12px;
@@ -76,6 +83,8 @@
       justify-content: space-between;
       align-items: baseline;
       margin-bottom: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .timeline-label {
@@ -113,37 +122,25 @@
       margin-top: -10px;
     }
 
-    .timeline-point {
+    .tl-point {
       position: relative;
       text-align: center;
       flex: 1;
+      cursor: pointer;
     }
 
-    .timeline-button {
-      position: relative;
+    .tl-dot {
       width: 18px;
       height: 18px;
       border-radius: 50%;
       border: 2px solid var(--accent);
       background: #000;
-      cursor: pointer;
       margin: 0 auto 6px;
       transition: transform 0.12s ease, box-shadow 0.12s ease,
                   background 0.12s ease, border-color 0.12s ease;
     }
 
-    .timeline-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.18);
-      background: #111;
-    }
-
-    .timeline-button.active {
-      background: var(--accent);
-      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.3);
-    }
-
-    .timeline-date-short {
+    .tl-date {
       font-size: 0.78rem;
       color: var(--accent);
       text-transform: uppercase;
@@ -151,11 +148,17 @@
       margin-bottom: 2px;
     }
 
-    .timeline-title-short {
+    .tl-title {
       font-size: 0.8rem;
       color: var(--text-main);
       max-width: 140px;
       margin: 0 auto;
+    }
+
+    .tl-point:hover .tl-dot {
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.18);
+      background: #111;
     }
 
     /* DETAIL SECTION */
@@ -171,6 +174,7 @@
     .detail-main-title {
       font-size: 1.02rem;
       font-weight: 600;
+      min-height: 1.3em;
     }
 
     .detail-date-full {
@@ -254,27 +258,93 @@
       font-size: 0.8rem;
       color: var(--text-muted);
       font-style: italic;
+      min-height: 1.3em;
+    }
+
+    /* Panels hidden by default */
+    .detail-panel {
+      display: none;
+    }
+
+    /* Default intro panel shown when page first loads */
+    #panel-intro {
+      display: block;
+    }
+
+    /* Active styles based on which radio is checked */
+
+    /* Event 1 */
+    #ev1:checked ~ .card .tl-e1 .tl-dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.3);
+    }
+    #ev1:checked ~ .card #panel-intro {
+      display: none;
+    }
+    #ev1:checked ~ .card #panel-1 {
+      display: block;
+    }
+
+    /* Event 2 */
+    #ev2:checked ~ .card .tl-e2 .tl-dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.3);
+    }
+    #ev2:checked ~ .card #panel-intro {
+      display: none;
+    }
+    #ev2:checked ~ .card #panel-2 {
+      display: block;
+    }
+
+    /* Event 3 */
+    #ev3:checked ~ .card .tl-e3 .tl-dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.3);
+    }
+    #ev3:checked ~ .card #panel-intro {
+      display: none;
+    }
+    #ev3:checked ~ .card #panel-3 {
+      display: block;
+    }
+
+    /* Event 4 */
+    #ev4:checked ~ .card .tl-e4 .tl-dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.3);
+    }
+    #ev4:checked ~ .card #panel-intro {
+      display: none;
+    }
+    #ev4:checked ~ .card #panel-4 {
+      display: block;
     }
 
     @media (max-width: 800px) {
       .detail-grid {
         grid-template-columns: minmax(0, 1fr);
       }
-
-      .timeline-title-short {
+      .tl-title {
         max-width: 100px;
       }
     }
 
     @media (max-width: 520px) {
-      .timeline-title-short {
-        display: none; /* keep it clean on tiny screens */
+      .tl-title {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
   <div class="shell">
+    <!-- Hidden radios control which panel is visible -->
+    <input type="radio" name="event" id="ev1" class="timeline-input" />
+    <input type="radio" name="event" id="ev2" class="timeline-input" />
+    <input type="radio" name="event" id="ev3" class="timeline-input" />
+    <input type="radio" name="event" id="ev4" class="timeline-input" />
+
     <div class="card">
       <h1 class="header-title">Tet Offensive: SIGINT vs. Surprise</h1>
       <p class="header-subtitle">
@@ -291,135 +361,217 @@
         </div>
 
         <div class="timeline-bar"></div>
-        <div class="timeline-points" id="timelinePoints">
-          <!-- Points inserted by JS -->
+        <div class="timeline-points">
+          <label for="ev1" class="tl-point tl-e1">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Late 1967</div>
+            <div class="tl-title">“General Offensive & Uprising”</div>
+          </label>
+          <label for="ev2" class="tl-point tl-e2">
+            <div class="tl-dot"></div>
+            <div class="tl-date">21 Jan 1968</div>
+            <div class="tl-title">Khe Sanh buildup & siege</div>
+          </label>
+          <label for="ev3" class="tl-point tl-e3">
+            <div class="tl-dot"></div>
+            <div class="tl-date">30 Jan 1968</div>
+            <div class="tl-title">Early Tet attacks</div>
+          </label>
+          <label for="ev4" class="tl-point tl-e4">
+            <div class="tl-dot"></div>
+            <div class="tl-date">31 Jan 1968</div>
+            <div class="tl-title">Peak urban attacks</div>
+          </label>
         </div>
       </div>
 
-      <!-- DETAILS -->
+      <!-- DETAILS (panels) -->
       <div class="detail-header">
-        <div class="detail-main-title" id="detailTitle">
-          Select an event on the timeline to start exploring the intelligence picture.
+        <div class="detail-main-title" id="detail-main-title">
+          <!-- Filled by panel content -->
         </div>
-        <div class="detail-date-full" id="detailDate"></div>
+        <div class="detail-date-full" id="detail-date-full"></div>
       </div>
 
       <div class="pill-row">
-        <span class="pill type" id="eventTypePill">Event type</span>
+        <span class="pill type" id="detail-type-pill">Event type</span>
         <span class="pill source">SIGINT / Sources</span>
         <span class="pill interp">Interpretation</span>
         <span class="pill outcome">Outcome</span>
       </div>
 
       <div class="detail-grid">
-        <div class="detail-block">
-          <div class="detail-block-title">Signals available</div>
-          <div id="detailSignals">
-            Intercepts, captured documents, and field reports form the raw data of
-            intelligence. Use the timeline above to see how those inputs looked at
-            different moments around Tet.
+        <!-- Intro panel (shown by default) -->
+        <div class="detail-panel" id="panel-intro">
+          <div class="detail-block">
+            <div class="detail-block-title">Signals available</div>
+            <div>
+              Intercepts, captured documents, and field reports formed a rich stream
+              of data for U.S. analysts before and during Tet. The question was not
+              just what they collected, but how they listened.
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">How analysts read it</div>
+            <div>
+              Assumptions about enemy weakness and steady U.S. progress acted like a
+              filter, shaping which warnings felt plausible and which were dismissed
+              as noise or propaganda.
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">What actually happened</div>
+            <div>
+              Tet revealed the gap between a confident narrative of control and the
+              reality of coordinated attacks in cities across South Vietnam. The
+              timeline below traces that gap.
+            </div>
           </div>
         </div>
-        <div class="detail-block">
-          <div class="detail-block-title">How analysts read it</div>
-          <div id="detailInterpretation">
-            Analysts don’t just receive signals — they filter them through
-            assumptions and models. That filtering shaped what Tet “meant” long
-            before the first shots on January 30–31, 1968.
+
+        <!-- Event 1 -->
+        <div class="detail-panel" id="panel-1">
+          <div class="detail-block">
+            <div class="detail-block-title">Signals available</div>
+            <div>
+              <ul>
+                <li>Captured directives and propaganda referenced a coming “General Offensive and General Uprising.”</li>
+                <li>COMINT showed increased messaging about agitation in cities and actions linked to Tet.</li>
+                <li>Some field reports flagged unusual Viet Cong political activity in urban areas.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">How analysts read it</div>
+            <div>
+              <ul>
+                <li>Many analysts coded the phrase as rhetorical, assuming it was morale-boosting propaganda rather than literal guidance.</li>
+                <li>Prevailing estimates held that Communist forces were too worn down for a large, coordinated offensive.</li>
+                <li>Analysts who took the language literally tended to be treated as presenting “worst-case” scenarios.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">What actually happened</div>
+            <div>
+              <ul>
+                <li>The phrase described the actual concept behind Tet: coordinated attacks on major political and urban targets.</li>
+                <li>Warning existed in the text, but it was filtered through a lens that made such an offensive seem implausible.</li>
+                <li>This is an early example of “mutual information failure”: signals were there, but belief did not update.</li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div class="detail-block">
-          <div class="detail-block-title">What actually happened</div>
-          <div id="detailReality">
-            Comparing signals and interpretations to what unfolded on the ground
-            shows how a system can be rich in data but still experience strategic
-            surprise.
+
+        <!-- Event 2 -->
+        <div class="detail-panel" id="panel-2">
+          <div class="detail-block">
+            <div class="detail-block-title">Signals available</div>
+            <div>
+              <ul>
+                <li>SIGINT and reconnaissance revealed a major buildup of PAVN forces, artillery, and logistics at Khe Sanh.</li>
+                <li>Intercepted messages indicated preparations for a sustained siege against the base.</li>
+                <li>Planning documents and communications highlighted Khe Sanh as a key focus of upcoming operations.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">How analysts read it</div>
+            <div>
+              <ul>
+                <li>MACV and Washington came to see Khe Sanh as the likely centerpiece of the next major enemy move.</li>
+                <li>Historical analogies to Dien Bien Phu reinforced expectations of a decisive, remote battle.</li>
+                <li>This focus made it easier to treat warnings about cities as secondary or supporting actions.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">What actually happened</div>
+            <div>
+              <ul>
+                <li>Khe Sanh was important but also served as a diversion that fixed U.S. attention and resources.</li>
+                <li>While the U.S. looked west, Communist forces prepared to strike across South Vietnam, including Saigon and Hue.</li>
+                <li>The intelligence on Khe Sanh was accurate but incomplete about the broader operational design.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event 3 -->
+        <div class="detail-panel" id="panel-3">
+          <div class="detail-block">
+            <div class="detail-block-title">Signals available</div>
+            <div>
+              <ul>
+                <li>On 30 January, field reports and some intercepts showed coordinated attacks beginning in parts of South Vietnam a day early.</li>
+                <li>Targets included district capitals, bases, and government installations in II and III Corps.</li>
+                <li>Communications traffic hinted at confusion over timing orders between regions.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">How analysts read it</div>
+            <div>
+              <ul>
+                <li>Many initial reports were treated as localized probes or limited offensives rather than the opening of a national campaign.</li>
+                <li>Existing beliefs about enemy capacity made a countrywide offensive seem unlikely.</li>
+                <li>Warnings that “Tet may be starting early” did not immediately reset the national threat estimate.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">What actually happened</div>
+            <div>
+              <ul>
+                <li>These early attacks were the first wave of Tet, launched ahead of schedule in some regions.</li>
+                <li>Failure to immediately reinterpret them as part of a coordinated plan cost time to adjust defenses in key cities.</li>
+                <li>The pattern was visible, but its meaning was minimized by strong priors.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event 4 -->
+        <div class="detail-panel" id="panel-4">
+          <div class="detail-block">
+            <div class="detail-block-title">Signals available</div>
+            <div>
+              <ul>
+                <li>On 31 January, reports described attacks on the U.S. embassy compound, major bases in Saigon, and dozens of provincial capitals.</li>
+                <li>Communications surged as both sides tried to coordinate under fire, with gaps and overloads in reporting networks.</li>
+                <li>Media and on-the-ground observers documented intense urban fighting in previously “secure” areas.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">How analysts read it</div>
+            <div>
+              <ul>
+                <li>Even as the scope became obvious, early official framing portrayed Tet as a “failed” offensive that had been repelled.</li>
+                <li>Briefings emphasized enemy casualties and argued that the Viet Cong had overreached.</li>
+                <li>This framing slowed recognition of Tet as a strategic turning point in American and global perceptions.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">What actually happened</div>
+            <div>
+              <ul>
+                <li>Militarily, Communist forces suffered heavy losses and did not spark a general uprising.</li>
+                <li>Strategically, images of fighting in Saigon, Hue, and inside the embassy compound shattered the narrative of steady U.S. progress.</li>
+                <li>The gap between official reassurances and visible destruction deepened the credibility crisis at home.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="footnote" id="detailFootnote">
-        Tip for your StoryMap narration: treat each step as a mini case study in
-        “mutual information failure” — the gap between what was knowable and what
-        decision-makers believed.
+      <div class="footnote">
+        Use this timeline in your StoryMap narration to talk about “mutual information failure” —
+        not just what SIGINT collected, but how assumptions shaped what decision-makers believed.
       </div>
     </div>
   </div>
-
-  <script>
-    const events = [
-      {
-        id: "e1",
-        shortDate: "Late 1967",
-        fullDate: "Late 1967",
-        shortLabel: "‘General Offensive and General Uprising’",
-        title: "‘General Offensive and General Uprising’ in documents and COMINT",
-        type: "Strategic warning",
-        signals: `
-          <ul>
-            <li>Captured directives and propaganda referenced a coming “General Offensive and General Uprising.”</li>
-            <li>COMINT picked up increased messaging about agitation in cities and preparations tied to the Tet holiday.</li>
-            <li>Some field reporting noted unusual Viet Cong political activity in urban areas.</li>
-          </ul>
-        `,
-        interpretation: `
-          <ul>
-            <li>Many U.S. analysts treated the phrase as rhetorical propaganda meant to boost morale, not as literal operational guidance.</li>
-            <li>Prevailing assessments held that Communist units were too worn down to mount a large nationwide offensive.</li>
-            <li>Analysts who took the language more literally were often categorized as presenting “worst-case” or unlikely scenarios.</li>
-          </ul>
-        `,
-        reality: `
-          <ul>
-            <li>The phrase in fact described the real operational concept for Tet: coordinated attacks on major urban and political targets.</li>
-            <li>The signals were present, but filtered through assumptions that made a broad offensive seem implausible.</li>
-            <li>This gap between text and interpretation laid the groundwork for strategic surprise.</li>
-          </ul>
-        `,
-        footnote:
-          "Here, COMINT and captured documents contained genuine warning—but belief in enemy weakness kept that warning from fully landing.",
-      },
-      {
-        id: "e2",
-        shortDate: "21 Jan 1968",
-        fullDate: "21 January 1968",
-        shortLabel: "Khe Sanh siege",
-        title: "Buildup and siege at Khe Sanh",
-        type: "Fixing action",
-        signals: `
-          <ul>
-            <li>SIGINT and reconnaissance showed a major buildup of PAVN forces, artillery, and logistics around Khe Sanh.</li>
-            <li>Intercepted messages pointed to preparations for sustained operations against the base.</li>
-            <li>Planning documents suggested high-level attention to making Khe Sanh a major engagement.</li>
-          </ul>
-        `,
-        interpretation: `
-          <ul>
-            <li>MACV and Washington came to see Khe Sanh as the expected centerpiece of any near-term enemy offensive.</li>
-            <li>Historical analogies to Dien Bien Phu reinforced the idea of a decisive remote set-piece battle.</li>
-            <li>This intense focus made it easier to treat other signals—especially about cities—as secondary or supporting actions.</li>
-          </ul>
-        `,
-        reality: `
-          <ul>
-            <li>Khe Sanh was important, but it also functioned as a diversion that fixed U.S. attention and forces.</li>
-            <li>While U.S. planners watched Khe Sanh, Communist forces were also preparing to strike across South Vietnam, including in Saigon and Hue.</li>
-            <li>The intelligence on Khe Sanh was not wrong, but it crowded out a wider sense of the operational design.</li>
-          </ul>
-        `,
-        footnote:
-          "This is a classic attention problem: real warning about one location narrowed the aperture on warning for the rest of the theater.",
-      },
-      {
-        id: "e3",
-        shortDate: "30 Jan 1968",
-        fullDate: "30 January 1968 (Tet Eve)",
-        shortLabel: "Early attacks",
-        title: "Early Tet attacks in parts of South Vietnam",
-        type: "Partial execution",
-        signals: `
-          <ul>
-            <li>Field units and some communications intercepts reported coordinated attacks starting a day earlier than expected in II and III Corps.</li>
-            <li>Signals included assaults on district capitals, bases, and government installations.</li>
-            <li>Some message traffic hinted at confusion in timing orders between re
+</body>
+</html>
 
