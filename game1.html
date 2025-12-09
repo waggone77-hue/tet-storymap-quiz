@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tet Offensive: Intelligence War Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-main: #000000;
+      --bg-card: #101010;
+      --bg-card-alt: #161616;
+      --accent: #e74c3c;
+      --accent-soft: #c0392b;
+      --text-main: #f5f5f5;
+      --text-muted: #a0a0a0;
+      --border-subtle: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #111 0, #000 60%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .shell {
+      max-width: 900px;
+      width: 100%;
+      padding: 24px 16px 32px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card-alt));
+      border-radius: 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      padding: 18px 18px 20px;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      margin: 0 0 4px;
+    }
+
+    .header-subtitle {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      max-width: 820px;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f4f4f4;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .badge.role {
+      background: linear-gradient(
+        135deg,
+        rgba(231, 76, 60, 0.28),
+        rgba(0, 0, 0, 0.7)
+      );
+    }
+
+    .badge.counter {
+      font-size: 0.78rem;
+    }
+
+    .scenario-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .scenario-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .scenario-text {
+      font-size: 0.9rem;
+      color: #dddddd;
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    .scenario-text strong {
+      color: #ffffff;
+    }
+
+    .question {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .option-btn {
+      border-radius: 12px;
+      padding: 9px 11px;
+      font-size: 0.9rem;
+      color: #f8f8f8;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease,
+        transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .option-btn:hover {
+      background: rgba(231, 76, 60, 0.08);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.7);
+    }
+
+    .option-btn[disabled] {
+      cursor: default;
+      opacity: 0.75;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .option-btn.selected-failure {
+      border-color: var(--accent);
+      background: rgba(231, 76, 60, 0.22);
+    }
+
+    .option-btn.selected-avoided {
+      border-color: #2ecc71;
+      background: rgba(46, 204, 113, 0.16);
+    }
+
+    .feedback {
+      font-size: 0.88rem;
+      margin-top: 6px;
+      padding: 8px 9px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-height: 2.4em;
+    }
+
+    .feedback span.label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      display: inline-block;
+      margin-bottom: 2px;
+    }
+
+    .feedback-failure {
+      color: var(--accent);
+    }
+
+    .feedback-avoided {
+      color: #2ecc71;
+    }
+
+    .controls-row {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.12s ease, transform 0.12s ease,
+        box-shadow 0.12s ease, color 0.12s ease;
+    }
+
+    .btn-next {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    .btn-next:hover {
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(231, 76, 60, 0.6);
+    }
+
+    .btn-restart {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid #444444;
+    }
+
+    .btn-restart:hover {
+      background: #222222;
+      color: #ffffff;
+    }
+
+    .summary {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.12);
+      font-size: 0.9rem;
+    }
+
+    .summary h2 {
+      margin: 0 0 4px;
+      font-size: 1.02rem;
+    }
+
+    .summary p {
+      margin: 2px 0;
+      color: var(--text-muted);
+    }
+
+    .summary strong {
+      color: #ffffff;
+    }
+
+    @media (max-width: 640px) {
+      .header-title {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <h1 class="header-title">Tet Intelligence War Room</h1>
+      <p class="header-subtitle">
+        You are a senior North Vietnamese strategist in late 1967–early 1968.
+        You have a table full of reports, intercepts, and captured documents.
+        At each step, decide how to read the intelligence. Do you repeat the
+        <strong>Vietnamese failures in judgment</strong> around Tet—or avoid them?
+      </p>
+
+      <div class="badge-row">
+        <span class="badge role">Role: Hanoi Strategist</span>
+        <span class="badge counter" id="counterBadge">
+          Failures mirrored: 0 &nbsp;|&nbsp; Failures avoided: 0
+        </span>
+      </div>
+
+      <div class="scenario-meta" id="scenarioMeta"></div>
+      <div class="scenario-title" id="scenarioTitle"></div>
+      <div class="scenario-text" id="scenarioText"></div>
+      <div class="question" id="scenarioQuestion"></div>
+
+      <div class="options" id="optionsContainer"></div>
+
+      <div class="feedback" id="feedbackBox">
+        <span class="label">Briefing note</span><br />
+        Make a decision to see how it lines up with what actually happened.
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-restart" id="restartBtn" type="button">
+          Restart
+        </button>
+        <button class="btn btn-next" id="nextBtn" type="button">
+          Next decision
+        </button>
+      </div>
+
+      <div class="summary" id="summaryBox" style="display: none;">
+        <h2>Debrief</h2>
+        <p id="summaryMain"></p>
+        <p id="summaryDetail"></p>
+        <p>
+          Use this debrief in your StoryMap narration to show that Tet was not
+          just an American intelligence failure. Hanoi’s own
+          <strong>overconfidence in urban uprisings, underestimation of losses,</strong>
+          and belief that “one big blow” could break the Saigon government also
+          misread the reality on the ground.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const scenarios = [
+      {
+        id: 1,
+        meta: "Late 1967 – Strategic guidance",
+        title: "Reading the slogan: “General Offensive and General Uprising”",
+        text: `
+          Captured directives and party documents talk about a coming
+          <strong>“General Offensive and General Uprising”</strong>. Cadres inside South Vietnam
+          report political agitation in cities and say that the people are “ready”
+          to throw off the Saigon government when the time comes.
+        `,
+        question:
+          "How do you, as a strategist, read this intelligence about a potential uprising?",
+        options: [
+          {
+            label:
+              "Assume a genuine urban uprising is likely: plan operations on the belief that city populations and ARVN troops will rise up once attacks begin.",
+            mirrorsFailure: true,
+            feedback:
+              "Historically, Hanoi placed heavy weight on the idea of a general uprising and expected urban populations and some ARVN units to flip. That uprising largely failed to materialize, especially outside places like Hue.",
+          },
+          {
+            label:
+              "Treat the reports cautiously: plan for some local support, but assume most city dwellers and ARVN units will stay on the sidelines or resist.",
+            mirrorsFailure: false,
+            feedback:
+              "This is the more cautious reading. In reality, the hoped-for general uprising did not appear on the scale planners imagined, leaving attacking forces more exposed than anticipated.",
+          },
+        ],
+      },
+      {
+        id: 2,
+        meta: "January 1968 – Force allocation",
+        title: "How much to commit to urban attacks?",
+        text: `
+          Intelligence from southern networks suggests that surprise is achievable:
+          U.S. and ARVN units are spread thin, many will be on holiday schedules for Tet,
+          and past ceasefires have been honored. At the same time, reports warn that
+          American firepower can respond quickly once targets are identified.
+        `,
+        question:
+          "How do you translate this into a force-allocation decision for urban fighting?",
+        options: [
+          {
+            label:
+              "Commit large main-force units into cities expecting they can hold ground for an extended period once surprise is achieved.",
+            mirrorsFailure: true,
+            feedback:
+              "Tet involved major main-force commitments into cities and towns. Many of those units suffered extremely heavy losses and could not hold territory once U.S./ARVN firepower came fully to bear.",
+          },
+          {
+            label:
+              "Use smaller, more dispersed units aiming for short, symbolic strikes, then withdraw before U.S./ARVN can concentrate their response.",
+            mirrorsFailure: false,
+            feedback:
+              "This more limited approach would have reduced losses. Historically, Communist forces paid a very high price for staying engaged in prolonged urban battles, especially in places like Hue.",
+          },
+        ],
+      },
+      {
+        id: 3,
+        meta: "30 January 1968 – Early attacks",
+        title: "When some regions attack early",
+        text: `
+          In II and III Corps, some units launch attacks <strong>a day early</strong> due to timing
+          confusion. Reports filter back that fighting has already begun in parts of
+          South Vietnam. Other units are still waiting for the main Tet schedule.
+        `,
+        question:
+          "As you receive these early reports, how do you interpret them in real time?",
+        options: [
+          {
+            label:
+              "Assume the early attacks will naturally trigger momentum and push the rest of the plan forward without adjustment.",
+            mirrorsFailure: true,
+            feedback:
+              "In practice, coordination problems meant some attacks began early and others late. The belief that the plan would simply self-correct added friction and made it harder to achieve the synchronized ‘shock’ envisioned on paper.",
+          },
+          {
+            label:
+              "Recognize a coordination problem: adjust expectations and messaging, and prepare for uneven results across regions.",
+            mirrorsFailure: false,
+            feedback:
+              "Seeing early attacks as a coordination failure would have prompted more realistic expectations about how “uniform” Tet would look in practice.",
+          },
+        ],
+      },
+      {
+        id: 4,
+        meta: "February 1968 – Assessing the outcome",
+        title: "Calling Tet a victory or a costly miscalculation?",
+        text: `
+          After days of intense urban fighting, reports show that U.S. and ARVN forces
+          have retaken most positions. Communist casualties are high. At the same time,
+          intelligence and media reporting indicate a profound shock in the United States:
+          public opinion is shaken, and confidence in official claims of progress has dropped.
+        `,
+        question:
+          "How do you, as a strategist, summarize Tet inside your own system?",
+        options: [
+          {
+            label:
+              "Declare it a clear strategic victory: heavy losses are acceptable because the political shock in the U.S. proves the plan worked almost perfectly.",
+            mirrorsFailure: true,
+            feedback:
+              "Hanoi emphasized Tet as a historic success, focusing on the political impact in the U.S. While that impact was real, downplaying the scale of losses and the failure to spark a broad uprising risked blinding the system to its own misjudgments.",
+          },
+          {
+            label:
+              "Call it a mixed outcome: acknowledge real political gains but also recognize that calculations about uprisings, casualties, and holding cities were flawed.",
+            mirrorsFailure: false,
+            feedback:
+              "A more balanced assessment would have treated Tet as both a shock to U.S. will and a costly miscalculation in terms of uprising expectations and force preservation.",
+          },
+        ],
+      },
+    ];
+
+    let currentIndex = 0;
+    let failuresMirrored = 0;
+    let failuresAvoided = 0;
+
+    const scenarioMetaEl = document.getElementById("scenarioMeta");
+    const scenarioTitleEl = document.getElementById("scenarioTitle");
+    const scenarioTextEl = document.getElementById("scenarioText");
+    const scenarioQuestionEl = document.getElementById("scenarioQuestion");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const feedbackBoxEl = document.getElementById("feedbackBox");
+    const counterBadgeEl = document.getElementById("counterBadge");
+    const nextBtnEl = document.getElementById("nextBtn");
+    const restartBtnEl = document.getElementById("restartBtn");
+    const summaryBoxEl = document.getElementById("summaryBox");
+    const summaryMainEl = document.getElementById("summaryMain");
+    const summaryDetailEl = document.getElementById("summaryDetail");
+
+    function updateCounters() {
+      counterBadgeEl.textContent =
+        "Failures mirrored: " +
+        failuresMirrored +
+        " \u00A0|\u00A0 Failures avoided: " +
+        failuresAvoided;
+    }
+
+    function renderScenario() {
+      const s = scenarios[currentIndex];
+      scenarioMetaEl.textContent = s.meta;
+      scenarioTitleEl.textContent = s.title;
+      scenarioTextEl.innerHTML = s.text;
+      scenarioQuestionEl.textContent = s.question;
+      feedbackBoxEl.innerHTML =
+        '<span class="label">Briefing note</span><br />Make a decision to see how it lines up with what actually happened.';
+      feedbackBoxEl.classList.remove("feedback-failure", "feedback-avoided");
+      summaryBoxEl.style.display = "none";
+
+      optionsContainerEl.innerHTML = "";
+      s.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option-btn";
+        btn.textContent = opt.label;
+        btn.addEventListener("click", () =>
+          handleChoice(s, opt, btn)
+        );
+        optionsContainerEl.appendChild(btn);
+      });
+
+      // If this is the last scenario, change button text
+      nextBtnEl.textContent =
+        currentIndex === scenarios.length - 1 ? "View debrief" : "Next decision";
+    }
+
+    function disableOptions() {
+      const buttons = optionsContainerEl.querySelectorAll(".option-btn");
+      buttons.forEach((b) => (b.disabled = true));
+    }
+
+    function handleChoice(scenario, option, btn) {
+      disableOptions();
+
+      if (option.mirrorsFailure) {
+        failuresMirrored++;
+        feedbackBoxEl.classList.add("feedback-failure");
+        feedbackBoxEl.classList.remove("feedback-avoided");
+        btn.classList.add("selected-failure");
+        feedbackBoxEl.innerHTML =
+          '<span class="label">You mirrored a Hanoi misjudgment</span><br />' +
+          option.feedback;
+      } else {
+        failuresAvoided++;
+        feedbackBoxEl.classList.add("feedback-avoided");
+        feedbackBoxEl.classList.remove("feedback-failure");
+        btn.classList.add("selected-avoided");
+        feedbackBoxEl.innerHTML =
+          '<span class="label">You avoided a Hanoi misjudgment</span><br />' +
+          option.feedback;
+      }
+
+      updateCounters();
+    }
+
+    function showSummary() {
+      summaryBoxEl.style.display = "block";
+      let main;
+      if (failuresMirrored === scenarios.length) {
+        main =
+          "You consistently thought the way Tet planners did—leaning into high-risk bets on uprisings, holding cities, and declaring the operation a near-total success.";
+      } else if (failuresMirrored === 0) {
+        main =
+          "You avoided Hanoi’s main misjudgments: you treated uprising claims cautiously, limited urban commitments, and recognized Tet as a mixed outcome.";
+      } else {
+        main =
+          "Your decisions landed somewhere in the middle: you shared some of Hanoi’s overconfidence but also saw cracks in the intelligence picture.";
+      }
+
+      const detail =
+        "Tet is often framed as an American intelligence failure, but North Vietnamese decision-makers also misread their own signals—especially about urban support, casualties, and how long they could hold ground.";
+
+      summaryMainEl.textContent = main;
+      summaryDetailEl.textContent = detail;
+    }
+
+    nextBtnEl.addEventListener("click", () => {
+      if (currentIndex < scenarios.length - 1) {
+        currentIndex++;
+        renderScenario();
+      } else {
+        showSummary();
+      }
+    });
+
+    restartBtnEl.addEventListener("click", () => {
+      currentIndex = 0;
+      failuresMirrored = 0;
+      failuresAvoided = 0;
+      updateCounters();
+      renderScenario();
+    });
+
+    // Initialize
+    updateCounters();
+    renderScenario();
+  </script>
+</body>
+</html>
