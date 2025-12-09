@@ -7,9 +7,8 @@
   <style>
     :root {
       --bg-main: #000000;
-      --bg-panel: #101010;
-      --bg-panel-alt: #161616;
-      --accent: #e74c3c;      /* red accent */
+      --bg-card: #101010;
+      --accent: #e74c3c;
       --accent-soft: #c0392b;
       --text-main: #f5f5f5;
       --text-muted: #a0a0a0;
@@ -23,57 +22,60 @@
     body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at top, #111 0, #000 60%);
-      color: var(--text-main);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
+      color: var(--text-main);
+      background: radial-gradient(circle at top, #111 0, #000 60%);
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
     }
 
-    .app-shell {
-      max-width: 1024px;
+    .shell {
+      max-width: 1000px;
       width: 100%;
       padding: 24px 16px 32px;
     }
 
     .card {
-      background: linear-gradient(135deg, var(--bg-panel), var(--bg-panel-alt));
+      background: linear-gradient(135deg, #101010, #161616);
       border-radius: 18px;
       border: 1px solid var(--border-subtle);
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
-      padding: 20px 18px 22px;
-    }
-
-    .header {
-      margin-bottom: 16px;
+      padding: 18px 18px 20px;
     }
 
     .header-title {
       font-size: 1.5rem;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.13em;
       margin: 0 0 4px;
     }
 
     .header-subtitle {
       font-size: 0.92rem;
       color: var(--text-muted);
-      max-width: 720px;
+      margin-bottom: 14px;
+      max-width: 800px;
     }
 
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr);
-      gap: 16px;
+    /* TIMELINE BAR */
+    .timeline-wrapper {
+      margin-top: 4px;
+      margin-bottom: 16px;
+      position: relative;
+      padding: 16px 10px 26px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    /* Timeline column */
-    .timeline-column {
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
-      padding-right: 12px;
+    .timeline-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
     }
 
     .timeline-label {
@@ -81,190 +83,169 @@
       text-transform: uppercase;
       letter-spacing: 0.16em;
       color: var(--text-muted);
-      margin-bottom: 8px;
     }
 
-    .timeline {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .timeline-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .timeline-bar {
       position: relative;
-    }
-
-    .timeline::before {
-      content: "";
-      position: absolute;
-      left: 6px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
+      width: 100%;
+      height: 3px;
       background: linear-gradient(
-        to bottom,
+        to right,
         rgba(255, 255, 255, 0.2),
-        rgba(255, 255, 255, 0.03)
+        rgba(255, 255, 255, 0.05)
       );
+      border-radius: 999px;
+      margin-top: 10px;
+      margin-bottom: 26px;
     }
 
-    .timeline-item {
+    .timeline-points {
       position: relative;
-      padding-left: 24px;
-      margin-bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin-top: -10px;
     }
 
-    .timeline-dot {
-      position: absolute;
-      left: 0;
-      top: 7px;
-      width: 12px;
-      height: 12px;
+    .timeline-point {
+      position: relative;
+      text-align: center;
+      flex: 1;
+    }
+
+    .timeline-button {
+      position: relative;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       border: 2px solid var(--accent);
       background: #000;
-    }
-
-    .timeline-item button {
-      width: 100%;
-      text-align: left;
-      background: transparent;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      padding: 8px 10px;
-      color: var(--text-main);
-      font-size: 0.9rem;
       cursor: pointer;
-      transition: background 0.12s ease, border-color 0.12s ease,
-                  transform 0.12s ease;
+      margin: 0 auto 6px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+                  background 0.12s ease, border-color 0.12s ease;
     }
 
-    .timeline-item button:hover {
-      background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(255, 255, 255, 0.08);
-      transform: translateY(-1px);
+    .timeline-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.18);
+      background: #111;
     }
 
-    .timeline-item button.active {
-      background: rgba(231, 76, 60, 0.12);
-      border-color: var(--accent);
+    .timeline-button.active {
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.3);
     }
 
-    .timeline-date {
-      font-size: 0.8rem;
+    .timeline-date-short {
+      font-size: 0.78rem;
       color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.12em;
       margin-bottom: 2px;
     }
 
-    .timeline-title {
-      font-size: 0.95rem;
+    .timeline-title-short {
+      font-size: 0.8rem;
+      color: var(--text-main);
+      max-width: 140px;
+      margin: 0 auto;
+    }
+
+    /* DETAIL SECTION */
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .detail-main-title {
+      font-size: 1.02rem;
       font-weight: 600;
     }
 
-    /* Detail panel */
-    .detail-column {
-      padding-left: 4px;
-    }
-
-    .detail-pill-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .event-tag {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
+    .detail-date-full {
+      font-size: 0.8rem;
       color: var(--text-muted);
     }
 
-    .event-type-pill {
-      font-size: 0.75rem;
+    .pill-row {
+      display: flex;
+      justify-content: flex-start;
+      gap: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      font-size: 0.74rem;
       text-transform: uppercase;
-      letter-spacing: 0.16em;
-      padding: 4px 12px;
+      letter-spacing: 0.12em;
+      padding: 3px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #f6f6f6;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f4f4f4;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .pill.type {
       background: linear-gradient(
         135deg,
-        rgba(231, 76, 60, 0.26),
-        rgba(0, 0, 0, 0.6)
+        rgba(231, 76, 60, 0.28),
+        rgba(0, 0, 0, 0.5)
       );
     }
 
-    .detail-title {
-      font-size: 1.05rem;
-      margin: 4px 0 8px;
-      font-weight: 600;
+    .pill.source {
+      background: rgba(52, 152, 219, 0.18);
     }
 
-    .detail-meta-date {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-bottom: 10px;
+    .pill.interp {
+      background: rgba(241, 196, 15, 0.18);
     }
 
-    .pill-grid {
+    .pill.outcome {
+      background: rgba(46, 204, 113, 0.18);
+    }
+
+    .detail-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
-      margin-bottom: 10px;
+      gap: 8px;
     }
 
-    .pill-grid span {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      font-size: 0.74rem;
-      padding: 4px 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #dddddd;
-    }
-
-    .pill-grid span:nth-child(1) {
-      background: rgba(52, 152, 219, 0.14); /* Signals */
-    }
-
-    .pill-grid span:nth-child(2) {
-      background: rgba(241, 196, 15, 0.16); /* Interpretation */
-    }
-
-    .pill-grid span:nth-child(3) {
-      background: rgba(46, 204, 113, 0.16); /* Reality */
-    }
-
-    .section-block {
-      margin-bottom: 10px;
+    .detail-block {
       padding: 8px 8px 9px;
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .section-label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      margin-bottom: 4px;
-      color: var(--text-muted);
-    }
-
-    .section-body {
       font-size: 0.87rem;
       line-height: 1.45;
     }
 
-    .section-body ul {
-      margin: 4px 0 0 18px;
+    .detail-block-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .detail-block ul {
+      margin: 4px 0 0 16px;
       padding: 0;
     }
 
-    .section-body li {
+    .detail-block li {
       margin: 2px 0;
     }
 
@@ -275,94 +256,92 @@
       font-style: italic;
     }
 
-    @media (max-width: 720px) {
-      .layout {
+    @media (max-width: 800px) {
+      .detail-grid {
         grid-template-columns: minmax(0, 1fr);
       }
-      .timeline-column {
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        padding-right: 0;
-        padding-bottom: 12px;
-        margin-bottom: 10px;
+
+      .timeline-title-short {
+        max-width: 100px;
       }
-      .detail-column {
-        padding-left: 0;
+    }
+
+    @media (max-width: 520px) {
+      .timeline-title-short {
+        display: none; /* keep it clean on tiny screens */
       }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div class="shell">
     <div class="card">
-      <div class="header">
-        <h1 class="header-title">Tet Offensive: Signals vs. Reality</h1>
-        <p class="header-subtitle">
-          Click through key moments before and during the Tet Offensive to see
-          what U.S. SIGINT was picking up, how analysts interpreted it, and what
-          actually unfolded on the ground.
-        </p>
+      <h1 class="header-title">Tet Offensive: SIGINT vs. Surprise</h1>
+      <p class="header-subtitle">
+        Click along the timeline to see what American signals intelligence was
+        picking up, how analysts interpreted those signals, and how that matched
+        (or failed to match) the reality of the Tet Offensive.
+      </p>
+
+      <!-- TIMELINE -->
+      <div class="timeline-wrapper">
+        <div class="timeline-label-row">
+          <div class="timeline-label">Timeline of Key Moments</div>
+          <div class="timeline-hint">Tap a red node to update the analysis below.</div>
+        </div>
+
+        <div class="timeline-bar"></div>
+        <div class="timeline-points" id="timelinePoints">
+          <!-- Points inserted by JS -->
+        </div>
       </div>
 
-      <div class="layout">
-        <!-- TIMELINE COLUMN -->
-        <div class="timeline-column">
-          <div class="timeline-label">Timeline</div>
-          <ul class="timeline" id="timelineList">
-            <!-- Items injected by JS -->
-          </ul>
+      <!-- DETAILS -->
+      <div class="detail-header">
+        <div class="detail-main-title" id="detailTitle">
+          Select an event on the timeline to start exploring the intelligence picture.
         </div>
+        <div class="detail-date-full" id="detailDate"></div>
+      </div>
 
-        <!-- DETAIL COLUMN -->
-        <div class="detail-column">
-          <div class="detail-pill-row">
-            <span class="event-tag">Event Detail</span>
-            <span class="event-type-pill" id="eventTypePill">Urban offensive</span>
-          </div>
-          <div class="detail-title" id="detailTitle">
-            Select an event on the left to explore the intelligence picture.
-          </div>
-          <div class="detail-meta-date" id="detailDate"></div>
+      <div class="pill-row">
+        <span class="pill type" id="eventTypePill">Event type</span>
+        <span class="pill source">SIGINT / Sources</span>
+        <span class="pill interp">Interpretation</span>
+        <span class="pill outcome">Outcome</span>
+      </div>
 
-          <div class="pill-grid">
-            <span>SIGINT / Source</span>
-            <span>U.S. Interpretation</span>
-            <span>Actual Outcome</span>
-          </div>
-
-          <div class="section-block">
-            <div class="section-label">Signals available</div>
-            <div class="section-body" id="detailSignals">
-              Intercepts, captured documents, and field reports form the raw
-              material of intelligence. Click an event to see what was
-              available.
-            </div>
-          </div>
-
-          <div class="section-block">
-            <div class="section-label">How U.S. analysts read it</div>
-            <div class="section-body" id="detailInterpretation">
-              Analysts filter signals through assumptions, models, and political
-              expectations. For Tet, those lenses often pointed away from a
-              nationwide offensive.
-            </div>
-          </div>
-
-          <div class="section-block">
-            <div class="section-label">What actually happened</div>
-            <div class="section-body" id="detailReality">
-              Compare the pre-attack reading with what unfolded to see how
-              misalignment between SIGINT and interpretation shaped the shock of
-              Tet.
-            </div>
-          </div>
-
-          <div class="footnote" id="detailFootnote">
-            Hint: you can use this panel in your StoryMap narration to talk about
-            “mutual information failure” — the gap between what was knowable and
-            what leaders believed.
+      <div class="detail-grid">
+        <div class="detail-block">
+          <div class="detail-block-title">Signals available</div>
+          <div id="detailSignals">
+            Intercepts, captured documents, and field reports form the raw data of
+            intelligence. Use the timeline above to see how those inputs looked at
+            different moments around Tet.
           </div>
         </div>
+        <div class="detail-block">
+          <div class="detail-block-title">How analysts read it</div>
+          <div id="detailInterpretation">
+            Analysts don’t just receive signals — they filter them through
+            assumptions and models. That filtering shaped what Tet “meant” long
+            before the first shots on January 30–31, 1968.
+          </div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-block-title">What actually happened</div>
+          <div id="detailReality">
+            Comparing signals and interpretations to what unfolded on the ground
+            shows how a system can be rich in data but still experience strategic
+            surprise.
+          </div>
+        </div>
+      </div>
+
+      <div class="footnote" id="detailFootnote">
+        Tip for your StoryMap narration: treat each step as a mini case study in
+        “mutual information failure” — the gap between what was knowable and what
+        decision-makers believed.
       </div>
     </div>
   </div>
@@ -371,115 +350,76 @@
     const events = [
       {
         id: "e1",
-        dateShort: "Late 1967",
-        dateFull: "Late 1967",
-        title: "‘General Offensive and General Uprising’ in COMINT & documents",
+        shortDate: "Late 1967",
+        fullDate: "Late 1967",
+        shortLabel: "‘General Offensive and General Uprising’",
+        title: "‘General Offensive and General Uprising’ in documents and COMINT",
         type: "Strategic warning",
         signals: `
           <ul>
-            <li>Captured directives and propaganda referring to a coming “General Offensive and General Uprising.”</li>
-            <li>Increased chatter about political agitation in cities and attacks timed to Tet.</li>
-            <li>Reports from some field units noting unusual VC/NRF political cadre activity in urban areas.</li>
+            <li>Captured directives and propaganda referenced a coming “General Offensive and General Uprising.”</li>
+            <li>COMINT picked up increased messaging about agitation in cities and preparations tied to the Tet holiday.</li>
+            <li>Some field reporting noted unusual Viet Cong political activity in urban areas.</li>
           </ul>
         `,
         interpretation: `
           <ul>
-            <li>Many analysts treated the language as exaggerated propaganda meant to boost morale and pressure negotiations.</li>
-            <li>Prevailing assumption: Communist forces were too weakened to coordinate a massive nationwide campaign.</li>
-            <li>Warnings that took the phrase literally were often downplayed as outliers or “worst-case” speculation.</li>
+            <li>Many U.S. analysts treated the phrase as rhetorical propaganda meant to boost morale, not as literal operational guidance.</li>
+            <li>Prevailing assessments held that Communist units were too worn down to mount a large nationwide offensive.</li>
+            <li>Analysts who took the language more literally were often categorized as presenting “worst-case” or unlikely scenarios.</li>
           </ul>
         `,
         reality: `
           <ul>
-            <li>The “General Offensive and General Uprising” was the actual operational concept for Tet: coordinated attacks on major cities and bases across South Vietnam.</li>
-            <li>Rather than empty rhetoric, it described a real plan whose scale U.S. officials had not fully internalized.</li>
-            <li>This gap set the stage for the shock when hundreds of targets were hit almost simultaneously.</li>
+            <li>The phrase in fact described the real operational concept for Tet: coordinated attacks on major urban and political targets.</li>
+            <li>The signals were present, but filtered through assumptions that made a broad offensive seem implausible.</li>
+            <li>This gap between text and interpretation laid the groundwork for strategic surprise.</li>
           </ul>
         `,
         footnote:
-          "Key takeaway: the same phrase—seen as propaganda by some—was operational guidance to others.",
+          "Here, COMINT and captured documents contained genuine warning—but belief in enemy weakness kept that warning from fully landing.",
       },
       {
         id: "e2",
-        dateShort: "21 Jan 1968",
-        dateFull: "21 January 1968",
-        title: "Siege of Khe Sanh begins",
+        shortDate: "21 Jan 1968",
+        fullDate: "21 January 1968",
+        shortLabel: "Khe Sanh siege",
+        title: "Buildup and siege at Khe Sanh",
         type: "Fixing action",
         signals: `
           <ul>
-            <li>Heavy buildup of PAVN forces and logistics in the Khe Sanh area detected by SIGINT and reconnaissance.</li>
-            <li>Intercepted communications showing artillery preparations and supply movements.</li>
-            <li>Increased North Vietnamese attention to the base in captured planning documents.</li>
+            <li>SIGINT and reconnaissance showed a major buildup of PAVN forces, artillery, and logistics around Khe Sanh.</li>
+            <li>Intercepted messages pointed to preparations for sustained operations against the base.</li>
+            <li>Planning documents suggested high-level attention to making Khe Sanh a major engagement.</li>
           </ul>
         `,
         interpretation: `
           <ul>
-            <li>Many in MACV and Washington saw Khe Sanh as the likely centerpiece of an upcoming enemy offensive.</li>
-            <li>Historical analogies to Dien Bien Phu pushed analysts toward expecting a decisive siege battle in the remote highlands.</li>
-            <li>Focus on Khe Sanh made other signals of urban and nationwide attacks easier to discount or fit into a “supporting attacks” narrative.</li>
+            <li>MACV and Washington came to see Khe Sanh as the expected centerpiece of any near-term enemy offensive.</li>
+            <li>Historical analogies to Dien Bien Phu reinforced the idea of a decisive remote set-piece battle.</li>
+            <li>This intense focus made it easier to treat other signals—especially about cities—as secondary or supporting actions.</li>
           </ul>
         `,
         reality: `
           <ul>
-            <li>Khe Sanh was important, but it functioned in part as a diversion that fixed U.S. attention and forces.</li>
-            <li>While MACV stared at Khe Sanh, Communist units were also preparing for coordinated attacks on Saigon, Hue, and dozens of other urban targets.</li>
-            <li>The intelligence picture was not wrong about Khe Sanh, but it was incomplete about the broader operational design.</li>
+            <li>Khe Sanh was important, but it also functioned as a diversion that fixed U.S. attention and forces.</li>
+            <li>While U.S. planners watched Khe Sanh, Communist forces were also preparing to strike across South Vietnam, including in Saigon and Hue.</li>
+            <li>The intelligence on Khe Sanh was not wrong, but it crowded out a wider sense of the operational design.</li>
           </ul>
         `,
         footnote:
-          "This is a classic example of attention bias: real signals about Khe Sanh crowded out signals about the rest of the country.",
+          "This is a classic attention problem: real warning about one location narrowed the aperture on warning for the rest of the theater.",
       },
       {
         id: "e3",
-        dateShort: "30 Jan 1968",
-        dateFull: "30 January 1968 (Tet Eve)",
-        title: "Early Tet attacks in II & III Corps",
+        shortDate: "30 Jan 1968",
+        fullDate: "30 January 1968 (Tet Eve)",
+        shortLabel: "Early attacks",
+        title: "Early Tet attacks in parts of South Vietnam",
         type: "Partial execution",
         signals: `
           <ul>
-            <li>Reports and some communications intercepts showed attacks beginning in parts of central and southern South Vietnam a day earlier than expected.</li>
-            <li>Field commanders reported coordinated assaults on district capitals and bases.</li>
-            <li>Some indications of confusion in Communist timing orders appeared in message traffic.</li>
-          </ul>
-        `,
-        interpretation: `
-          <ul>
-            <li>These initial attacks were often read as local incidents or limited probes, not as the opening of a countrywide offensive.</li>
-            <li>Existing assumptions—that the enemy could not sustain a broad urban campaign—made it easier to interpret them as isolated.</li>
-            <li>Warnings that this might be “Tet, starting early” did not immediately reset the national intelligence estimate.</li>
-          </ul>
-        `,
-        reality: `
-          <ul>
-            <li>In hindsight, these January 30 attacks were the leading edge of Tet, triggered early in some regions.</li>
-            <li>The fact that they were misread as local events cost decision-makers precious time to adjust posture in Saigon and other major cities.</li>
-            <li>The mismatch between the pattern on the ground and the mental model of a limited enemy played directly into surprise.</li>
-          </ul>
-        `,
-        footnote:
-          "Here, the problem wasn’t the absence of signals, but the failure to reframe them as evidence of a national-level offensive.",
-      },
-      {
-        id: "e4",
-        dateShort: "31 Jan 1968",
-        dateFull: "31 January 1968",
-        title: "Saigon, Hue, and nationwide attacks peak",
-        type: "Shock phase",
-        signals: `
-          <ul>
-            <li>Ongoing reports of attacks on the U.S. embassy compound, key installations in Saigon, and major provincial capitals.</li>
-            <li>Communications interruptions and surges as both sides tried to respond under fire.</li>
-            <li>Street-level reporting of firefights in places previously considered relatively secure.</li>
-          </ul>
-        `,
-        interpretation: `
-          <ul>
-            <li>Even as the scope of the attacks became clear, early briefings tried to frame Tet as a “failed offensive” that had been repelled.</li>
-            <li>Communicators emphasized enemy casualties and the idea that the Viet Cong had shot their bolt.</li>
-            <li>This framing slowed recognition of how Tet had already changed U.S. and global perceptions of the war.</li>
-          </ul>
-        `,
-        reality: `
-          <ul>
-            <li>Militarily, Communist forces suffered heavy casualties and did not trigger the hoped-for general uprising.</li>
-            <li>Strategically, however, the sight of fighting inside the embassy compound and in Hue and Saigon shattered t
+            <li>Field units and some communications intercepts reported coordinated attacks starting a day earlier than expected in II and III Corps.</li>
+            <li>Signals included assaults on district capitals, bases, and government installations.</li>
+            <li>Some message traffic hinted at confusion in timing orders between re
+
