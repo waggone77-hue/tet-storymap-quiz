@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tet Intel Panic!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: #000000;
+      color: #f5f5f5;
+    }
+
+    .game-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #111111;
+      padding: 1.75rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+      border: 1px solid #333333;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #cccccc;
+      margin-bottom: 1.25rem;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .status-pill {
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: #1c1c1c;
+      border: 1px solid #444444;
+    }
+
+    .report-box {
+      min-height: 140px;
+      background: #181818;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      border: 1px solid #333333;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .report-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #aaaaaa;
+      margin-bottom: 0.4rem;
+    }
+
+    .report-text {
+      font-size: 1.02rem;
+      line-height: 1.4;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid #444444;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #1f1f1f;
+      color: #f5f5f5;
+      transition:
+        background 0.15s ease,
+        transform 0.05s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+    }
+
+    button:hover {
+      background: #2b2b2b;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-start {
+      border-color: #2ecc71;
+    }
+
+    .btn-important {
+      border-color: #f1c40f;
+    }
+
+    .btn-noise {
+      border-color: #3498db;
+    }
+
+    .feedback {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      min-height: 1.1rem;
+    }
+
+    .feedback.good {
+      color: #2ecc71;
+    }
+
+    .feedback.bad {
+      color: #e74c3c;
+    }
+
+    .fun-fact {
+      font-size: 0.85rem;
+      color: #bbbbbb;
+      min-height: 1.3rem;
+    }
+
+    .final-result {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      .game-container {
+        padding: 1.25rem;
+      }
+
+      .status-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Tet Intel Panic! 🛰️📡</h1>
+    <p class="subtitle">
+      You’re an intelligence officer in early 1968. Reports are flying in. For each one, decide if it’s
+      <strong>IMPORTANT</strong> or just <strong>NOISE</strong> before the timer hits zero. No pressure.
+    </p>
+
+    <div class="status-bar">
+      <div class="status-pill">⏱️ Time left: <span id="time">30</span>s</div>
+      <div class="status-pill">✅ Correct: <span id="correct">0</span> • ❌ Wrong: <span id="wrong">0</span></div>
+    </div>
+
+    <div class="report-box">
+      <div class="report-label">Incoming report</div>
+      <div class="report-text" id="report-text">
+        Press <strong>Start Game</strong> to begin the chaos.
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="start-btn" class="btn-start">▶ Start Game</button>
+      <button id="important-btn" class="btn-important" disabled>This is IMPORTANT</button>
+      <button id="noise-btn" class="btn-noise" disabled>Just NOISE</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <div class="fun-fact" id="fun-fact"></div>
+    <div class="final-result" id="final-result"></div>
+  </div>
+
+  <script>
+    const reports = [
+      {
+        text: "Intercept: Repeated references to a 'General Offensive and General Uprising' beginning at Tet.",
+        important: true,
+      },
+      {
+        text: "HUMINT source: VC cadre in Saigon says \"something big\" is planned for the holiday.",
+        important: true,
+      },
+      {
+        text: "Intercept: Front-line unit complaining for the fifth time this week about running out of coffee.",
+        important: false,
+      },
+      {
+        text: "Intercept: Messages show VC units quietly shifting from the border back toward cities.",
+        important: true,
+      },
+      {
+        text: "HUMINT report: One villager swears his cousin’s neighbor’s uncle saw aliens near Khe Sanh.",
+        important: false,
+      },
+      {
+        text: "SIGINT: Enemy radio nets suddenly go dark on key frequencies they’ve used for months.",
+        important: true,
+      },
+      {
+        text: "Intercept: \"Request more fireworks for Tet celebration\" from ARVN rear-area unit.",
+        important: false,
+      },
+      {
+        text: "Captured document: Detailed attack plan with targets in Saigon and provincial capitals.",
+        important: true,
+      },
+      {
+        text: "HUMINT: Bar gossip in Saigon that 'nothing ever happens during Tet, relax.'",
+        important: false,
+      },
+      {
+        text: "Intercept: Confusing logistics message about rice shipments and pig distribution.",
+        important: false,
+      },
+    ];
+
+    const funFacts = [
+      "Modern SIGINT can vacuum up global digital traffic, but in 1968 analysts still spent hours poring over paper logs and radio tapes.",
+      "Tet showed that even when SIGINT spots clues, humans still have to interpret what they mean — and they don’t always agree.",
+      "Some reports in Vietnam were so vague that analysts joked they were reading tea leaves, just with more acronyms.",
+      "Fun twist: U.S. intel saw lots of signs of activity before Tet — they just disagreed on what it added up to.",
+    ];
+
+    const reportTextEl = document.getElementById("report-text");
+    const feedbackEl = document.getElementById("feedback");
+    const funFactEl = document.getElementById("fun-fact");
+    const finalResultEl = document.getElementById("final-result");
+    const timeEl = document.getElementById("time");
+    const correctEl = document.getElementById("correct");
+    const wrongEl = document.getElementById("wrong");
+
+    const startBtn = document.getElementById("start-btn");
+    const importantBtn = document.getElementById("important-btn");
+    const noiseBtn = document.getElementById("noise-btn");
+
+    let timer = null;
+    let timeLeft = 30;
+    let currentReport = null;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let gameActive = false;
+
+    function pickRandomReport() {
+      const idx = Math.floor(Math.random() * reports.length);
+      currentReport = reports[idx];
+      reportTextEl.textContent = currentReport.text;
+      feedbackEl.textContent = "";
+      feedbackEl.className = "feedback";
+      funFactEl.textContent = "";
+    }
+
+    function pickRandomFunFact() {
+      const idx = Math.floor(Math.random() * funFacts.length);
+      return funFacts[idx];
+    }
+
+    function updateStatus() {
+      timeEl.textContent = timeLeft;
+      correctEl.textContent = correctCount;
+      wrongEl.textContent = wrongCount;
+    }
+
+    function endGame() {
+      gameActive = false;
+      clearInterval(timer);
+      timer = null;
+      importantBtn.disabled = true;
+      noiseBtn.disabled = true;
+      startBtn.disabled = false;
+      startBtn.textContent = "Play Again";
+
+      let verdict = "";
+      if (correctCount === 0 && wrongCount === 0) {
+        verdict = "You ignored everything. Bold strategy, let’s see how Saigon feels about it.";
+      } else if (correctCount > wrongCount + 3) {
+        verdict =
+          "Nice work, analyst. You actually read the intel — MACV might keep you around after this briefing.";
+      } else if (correctCount >= wrongCount) {
+        verdict =
+          "Mixed performance. You caught some real threats, but you also green-lit a lot of coffee complaints.";
+      } else {
+        verdict =
+          "Congratulations, you just briefed the Ambassador that Tet would be super chill. About that Embassy compound...";
+      }
+
+      finalResultEl.textContent = verdict;
+      funFactEl.textContent = pickRandomFunFact();
+    }
+
+    function startGame() {
+      gameActive = true;
+      timeLeft = 30;
+      correctCount = 0;
+      wrongCount = 0;
+      updateStatus();
+      finalResultEl.textContent = "";
+      funFactEl.textContent = "";
+      feedbackEl.textContent = "";
+      feedbackEl.className = "feedback";
+
+      startBtn.disabled = true;
+      importantBtn.disabled = false;
+      noiseBtn.disabled = false;
+
+      pickRandomReport();
+
+      timer = setInterval(() => {
+        if (!gameActive) return;
+        timeLeft--;
+        updateStatus();
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function handleAnswer(isImportantGuess) {
+      if (!gameActive || !currentReport) return;
+
+      const correct = currentReport.important === isImportantGuess;
+      if (correct) {
+        correctCount++;
+        feedbackEl.textContent = "Nice call. Your boss might actually read this one in the morning brief.";
+        feedbackEl.className = "feedback good";
+      } else {
+        wrongCount++;
+        feedbackEl.textContent =
+          "Oof. Either you just blew off a major clue or escalated someone’s lunch order.";
+        feedbackEl.className = "feedback bad";
+      }
+      updateStatus();
+
+      // Show a fun fact sometimes
+      if (Math.random() < 0.4) {
+        funFactEl.textContent = pickRandomFunFact();
+      } else {
+        funFactEl.textContent = "";
+      }
+
+      // Load the next report
+      pickRandomReport();
+    }
+
+    startBtn.addEventListener("click", startGame);
+    importantBtn.addEventListener("click", () => handleAnswer(true));
+    noiseBtn.addEventListener("click", () => handleAnswer(false));
+  </script>
+</body>
+</html>
